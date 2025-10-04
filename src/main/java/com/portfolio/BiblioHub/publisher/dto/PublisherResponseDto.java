@@ -1,3 +1,18 @@
 package com.portfolio.BiblioHub.publisher.dto;
 
-public class PublisherResponseDto {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PublisherResponseDto {
+    private Integer publisherId;
+    private String publisherName;
+    private String publisherAddress;
+    private String publisherContactInfo;
+    private List<String> books;
+}

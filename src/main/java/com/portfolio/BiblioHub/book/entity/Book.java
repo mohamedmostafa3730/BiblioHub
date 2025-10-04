@@ -27,7 +27,7 @@ public class Book {
     private double bookPrice;
 
     @Column(name = "book_isbn", nullable = false, unique = true, length = 30)
-    private String BookISBN;
+    private String bookISBN;
 
     @Column(name = "stock_quantity", nullable = false)
     private int stockQuantity;

@@ -29,7 +29,6 @@ public class Author {
     private String authorBio;
 
     @ManyToMany
-
     @JoinTable(
             name = "book_author",
             joinColumns = @JoinColumn(name = "author_id"),
