@@ -1,10 +1,6 @@
 package com.portfolio.BiblioHub.book.dto;
 
-import com.portfolio.BiblioHub.author.dto.AuthorResponseDto;
-import com.portfolio.BiblioHub.category.dto.CategoryResponseDto;
-import com.portfolio.BiblioHub.publisher.dto.PublisherResponseDto;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,9 +21,9 @@ public class BookResponseDto {
     private String publisherName;
 
     // Category details
-    private Integer categoryId;
+    private Long categoryId;       // better use Long instead of Integer
     private String categoryName;
 
-    // Author details (mini DTOs or just names)
+    // Authors (just names or mini DTOs)
     private List<String> authors;
 }

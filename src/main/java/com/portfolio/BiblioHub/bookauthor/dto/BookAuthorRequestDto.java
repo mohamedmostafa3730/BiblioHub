@@ -1,6 +1,7 @@
 package com.portfolio.BiblioHub.bookauthor.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BookAuthorRequestDto {
 
-    @NotBlank(message = "The Book ID is required")
+    @NotNull(message = "The Book ID is required")
     private Long bookId;
 
-    @NotBlank(message = "The Author ID is required")
+    @NotNull(message = "The Author ID is required")
     private Long authorId;
 
 }
