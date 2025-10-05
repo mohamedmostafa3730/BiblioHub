@@ -65,6 +65,8 @@ A comprehensive RESTful API for managing library operations including books, aut
 
 ## 🗄 Database Schema
 
+### Entity Relationship Diagram
+
 ```mermaid
 erDiagram
     BOOK ||--o{ BOOK_AUTHOR : has
