@@ -5,6 +5,7 @@ import com.portfolio.BiblioHub.common.dto.ApiResponse;
 import com.portfolio.BiblioHub.visitor.dto.VisitorRequestDto;
 import com.portfolio.BiblioHub.visitor.dto.VisitorResponseDto;
 import com.portfolio.BiblioHub.visitor.service.VisitorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,22 +16,19 @@ import java.util.List;
 @RequestMapping("/api/visitors")
 @RequiredArgsConstructor
 public class VisitorController {
+
     private final VisitorService visitorService;
     private final ResponseBuilder responseBuilder;
 
-    @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<VisitorResponseDto>>> addAllVisitors(
-            @RequestBody List<VisitorRequestDto> dtos) {
-        return responseBuilder.created(visitorService.addAll(dtos));
-    }
-
     @PostMapping
-    public ResponseEntity<ApiResponse<VisitorResponseDto>> createVisitor(@RequestBody VisitorRequestDto dto) {
+    public ResponseEntity<ApiResponse<VisitorResponseDto>> createVisitor(
+            @Valid @RequestBody VisitorRequestDto dto) {
         return responseBuilder.created(visitorService.createVisitor(dto));
     }
 
     @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<VisitorResponseDto>>> createVisitorsBulk(@RequestBody List<VisitorRequestDto> dtos) {
+    public ResponseEntity<ApiResponse<List<VisitorResponseDto>>> addVisitorsBulk(
+            @Valid @RequestBody List<VisitorRequestDto> dtos) {
         return responseBuilder.created(visitorService.addAll(dtos));
     }
 
@@ -45,8 +43,9 @@ public class VisitorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<VisitorResponseDto>> updateVisitor(@PathVariable Long id,
-                                                                         @RequestBody VisitorRequestDto dto) {
+    public ResponseEntity<ApiResponse<VisitorResponseDto>> updateVisitor(
+            @PathVariable Long id,
+            @Valid @RequestBody VisitorRequestDto dto) {
         return responseBuilder.ok(visitorService.updateVisitor(id, dto));
     }
 

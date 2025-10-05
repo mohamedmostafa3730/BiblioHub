@@ -141,4 +141,29 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public OrderItemResponseDTO createOrderItem(OrderItemRequestDTO dto) {
+        return null;
+    }
+
+    @Override
+    public OrderItemResponseDTO getOrderItemById(Long id) {
+        return null;
+    }
+
+    @Override
+    public List<OrderItemResponseDTO> getAllOrderItems() {
+        return List.of();
+    }
+
+    @Override
+    public OrderItemResponseDTO updateOrderItem(Long id, OrderItemRequestDTO dto) {
+        return null;
+    }
+
+    @Override
+    public void deleteOrderItem(Long id) {
+
+    }
+
 }

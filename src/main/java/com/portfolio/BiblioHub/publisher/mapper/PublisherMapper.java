@@ -7,6 +7,7 @@ import com.portfolio.BiblioHub.publisher.entity.Publisher;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +18,10 @@ import java.util.stream.Collectors;
  * - PublisherRequestDto -> Publisher
  * - Publisher -> PublisherResponseDto
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public interface PublisherMapper {
     /**
      * Converts a request DTO into a Publisher entity.

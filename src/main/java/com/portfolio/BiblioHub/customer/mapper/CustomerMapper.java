@@ -7,6 +7,7 @@ import com.portfolio.BiblioHub.order.entity.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +20,10 @@ import java.util.stream.Collectors;
  * - Convert Customer entities into response DTOs for API output.
  * - Update existing Customer entities from request DTOs.
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public interface CustomerMapper {
     /*Notes:
      * - customerId is ignored (auto-generated).

@@ -6,6 +6,7 @@ import com.portfolio.BiblioHub.bookauthor.entity.BookAuthor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Mapper for converting between BookAuthor entity (join table)
@@ -13,7 +14,10 @@ import org.mapstruct.MappingTarget;
  * <p>
  * BookAuthor links a Book with an Author using a composite key (BookAuthorId).
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public interface BookAuthorMapper {
     /**
      * Converts a request DTO into a BookAuthor entity.

@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryResponseDto {
-    private Integer categoryId;
+    private Long categoryId;
     private String categoryName;
     private String categoryDescription;
     private List<String> books;

@@ -1,10 +1,13 @@
 package com.portfolio.BiblioHub.category.controller;
 
+import com.portfolio.BiblioHub.bookauthor.dto.BookAuthorRequestDto;
+import com.portfolio.BiblioHub.bookauthor.dto.BookAuthorResponseDto;
 import com.portfolio.BiblioHub.category.dto.CategoryRequestDto;
 import com.portfolio.BiblioHub.category.dto.CategoryResponseDto;
 import com.portfolio.BiblioHub.category.service.CategoryService;
 import com.portfolio.BiblioHub.common.builder.ResponseBuilder;
 import com.portfolio.BiblioHub.common.dto.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +22,8 @@ public class CategoryController {
     private final ResponseBuilder responseBuilder;
 
     @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<CategoryResponseDto>>> addAllCategories(
-            @RequestBody List<CategoryRequestDto> dtos) {
+    public ResponseEntity<ApiResponse<List<CategoryResponseDto>>> addCategoriesBulk(
+            @Valid @RequestBody List<CategoryRequestDto> dtos) {
         return responseBuilder.created(categoryService.addAll(dtos));
     }
 
@@ -29,7 +32,7 @@ public class CategoryController {
         return responseBuilder.created(categoryService.createCategory(dto));
     }
 
-    @PostMapping("/bulk")
+    @PostMapping("/bulk-create")
     public ResponseEntity<ApiResponse<List<CategoryResponseDto>>> createBulk(@RequestBody List<CategoryRequestDto> dtos) {
         return responseBuilder.created(categoryService.addAll(dtos));
     }

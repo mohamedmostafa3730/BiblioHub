@@ -5,6 +5,7 @@ import com.portfolio.BiblioHub.common.dto.ApiResponse;
 import com.portfolio.BiblioHub.customer.dto.CustomerRequestDto;
 import com.portfolio.BiblioHub.customer.dto.CustomerResponseDto;
 import com.portfolio.BiblioHub.customer.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,8 @@ public class CustomerController {
     private final ResponseBuilder responseBuilder;
 
     @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<CustomerResponseDto>>> addAllCustomers(
-            @RequestBody List<CustomerRequestDto> dtos) {
+    public ResponseEntity<ApiResponse<List<CustomerResponseDto>>> addCustomersBulk(
+            @Valid @RequestBody List<CustomerRequestDto> dtos) {
         return responseBuilder.created(customerService.addAll(dtos));
     }
 
@@ -29,7 +30,7 @@ public class CustomerController {
         return responseBuilder.created(customerService.createCustomer(dto));
     }
 
-    @PostMapping("/bulk")
+    @PostMapping("/bulk-create")
     public ResponseEntity<ApiResponse<List<CustomerResponseDto>>> createCustomersBulk(@RequestBody List<CustomerRequestDto> dtos) {
         return responseBuilder.created(customerService.addAll(dtos));
     }

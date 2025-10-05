@@ -19,7 +19,19 @@ public interface OrderService {
     OrderResponseDto updateOrder(Long id, OrderRequestDto dto);
 
     void deleteOrder(Long id);
+
     List<OrderResponseDto> addAllOrders(List<OrderRequestDto> dtos);
+
     List<OrderItemResponseDTO> addAllOrderItems(List<OrderItemRequestDTO> dtos);
+
+    OrderItemResponseDTO createOrderItem(OrderItemRequestDTO dto);
+
+    OrderItemResponseDTO getOrderItemById(Long id);
+
+    List<OrderItemResponseDTO> getAllOrderItems();
+
+    OrderItemResponseDTO updateOrderItem(Long id, OrderItemRequestDTO dto);
+
+    void deleteOrderItem(Long id);
 
 }

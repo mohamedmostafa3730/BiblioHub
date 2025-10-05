@@ -29,7 +29,7 @@ public class BookAuthorController {
 
     // Add multiple authors to books (bulk)
     @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<BookAuthorResponseDto>>> addAuthorsBulk(
+    public ResponseEntity<ApiResponse<List<BookAuthorResponseDto>>> addBookAuthorBulk(
             @Valid @RequestBody List<BookAuthorRequestDto> dtos) {
         return responseBuilder.created(bookAuthorService.addAll(dtos));
     }

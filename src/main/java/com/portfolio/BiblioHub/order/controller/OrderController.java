@@ -2,11 +2,12 @@ package com.portfolio.BiblioHub.order.controller;
 
 import com.portfolio.BiblioHub.common.builder.ResponseBuilder;
 import com.portfolio.BiblioHub.common.dto.ApiResponse;
-import com.portfolio.BiblioHub.order.dto.OrderItemRequestDTO;
-import com.portfolio.BiblioHub.order.dto.OrderItemResponseDTO;
 import com.portfolio.BiblioHub.order.dto.OrderRequestDto;
 import com.portfolio.BiblioHub.order.dto.OrderResponseDto;
+import com.portfolio.BiblioHub.order.dto.OrderItemRequestDTO;
+import com.portfolio.BiblioHub.order.dto.OrderItemResponseDTO;
 import com.portfolio.BiblioHub.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,24 +18,18 @@ import java.util.List;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
-
     private final OrderService orderService;
     private final ResponseBuilder responseBuilder;
 
-    // ================== ORDER ENDPOINTS ==================
-
-    @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<OrderResponseDto>>> addAllOrders(@RequestBody List<OrderRequestDto> dtos) {
-        return responseBuilder.created(orderService.addAllOrders(dtos));
-    }
-
     @PostMapping
-    public ResponseEntity<ApiResponse<OrderResponseDto>> createOrder(@RequestBody OrderRequestDto dto) {
+    public ResponseEntity<ApiResponse<OrderResponseDto>> createOrder(
+            @Valid @RequestBody OrderRequestDto dto) {
         return responseBuilder.created(orderService.createOrder(dto));
     }
 
     @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<OrderResponseDto>>> createOrdersBulk(@RequestBody List<OrderRequestDto> dtos) {
+    public ResponseEntity<ApiResponse<List<OrderResponseDto>>> addOrdersBulk(
+            @Valid @RequestBody List<OrderRequestDto> dtos) {
         return responseBuilder.created(orderService.addAllOrders(dtos));
     }
 
@@ -48,9 +43,15 @@ public class OrderController {
         return responseBuilder.ok(orderService.getAllOrders());
     }
 
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<ApiResponse<List<OrderResponseDto>>> getByCustomer(@PathVariable Long customerId) {
+        return responseBuilder.ok(orderService.getOrdersByCustomer(customerId));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> updateOrder(@PathVariable Long id,
-                                                                     @RequestBody OrderRequestDto dto) {
+    public ResponseEntity<ApiResponse<OrderResponseDto>> updateOrder(
+            @PathVariable Long id,
+            @Valid @RequestBody OrderRequestDto dto) {
         return responseBuilder.ok(orderService.updateOrder(id, dto));
     }
 
@@ -60,27 +61,24 @@ public class OrderController {
         return responseBuilder.noContent();
     }
 
-    // ================== ORDER ITEM ENDPOINTS ==================
-
-    @PostMapping("/items/bulk")
-    public ResponseEntity<ApiResponse<List<OrderItemResponseDTO>>> addAllOrderItems(
-            @RequestBody List<OrderItemRequestDTO> dtos) {
-        return responseBuilder.created(orderService.addAllOrderItems(dtos));
-    }
+    // Item‐level endpoints:
 
     @PostMapping("/items")
-    public ResponseEntity<ApiResponse<OrderItemResponseDTO>> createOrderItem(@RequestBody OrderItemRequestDTO dto) {
+    public ResponseEntity<ApiResponse<OrderItemResponseDTO>> createOrderItem(
+            @Valid @RequestBody OrderItemRequestDTO dto) {
         return responseBuilder.created(orderService.createOrderItem(dto));
     }
 
     @PostMapping("/items/bulk")
-    public ResponseEntity<ApiResponse<List<OrderItemResponseDTO>>> createOrderItemsBulk(@RequestBody List<OrderItemRequestDTO> dtos) {
+    public ResponseEntity<ApiResponse<List<OrderItemResponseDTO>>> addOrderItemsBulk(
+            @Valid @RequestBody List<OrderItemRequestDTO> dtos) {
         return responseBuilder.created(orderService.addAllOrderItems(dtos));
     }
 
-    @GetMapping("/items/{id}")
-    public ResponseEntity<ApiResponse<OrderItemResponseDTO>> getOrderItem(@PathVariable Long id) {
-        return responseBuilder.ok(orderService.getOrderItemById(id));
+    @GetMapping("/items/{itemId}")
+    public ResponseEntity<ApiResponse<OrderItemResponseDTO>> getOrderItem(
+            @PathVariable Long itemId) {
+        return responseBuilder.ok(orderService.getOrderItemById(itemId));
     }
 
     @GetMapping("/items")
@@ -88,15 +86,16 @@ public class OrderController {
         return responseBuilder.ok(orderService.getAllOrderItems());
     }
 
-    @PutMapping("/items/{id}")
-    public ResponseEntity<ApiResponse<OrderItemResponseDTO>> updateOrderItem(@PathVariable Long id,
-                                                                             @RequestBody OrderItemRequestDTO dto) {
-        return responseBuilder.ok(orderService.updateOrderItem(id, dto));
+    @PutMapping("/items/{itemId}")
+    public ResponseEntity<ApiResponse<OrderItemResponseDTO>> updateOrderItem(
+            @PathVariable Long itemId,
+            @Valid @RequestBody OrderItemRequestDTO dto) {
+        return responseBuilder.ok(orderService.updateOrderItem(itemId, dto));
     }
 
-    @DeleteMapping("/items/{id}")
-    public ResponseEntity<Void> deleteOrderItem(@PathVariable Long id) {
-        orderService.deleteOrderItem(id);
+    @DeleteMapping("/items/{itemId}")
+    public ResponseEntity<Void> deleteOrderItem(@PathVariable Long itemId) {
+        orderService.deleteOrderItem(itemId);
         return responseBuilder.noContent();
     }
 }

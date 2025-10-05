@@ -6,11 +6,15 @@ import com.portfolio.BiblioHub.order.entity.OrderItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Mapper for converting between OrderItem entities and DTOs.
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public interface OrderItemMapper {
     /**
      * Converts a request DTO into an OrderItem entity.

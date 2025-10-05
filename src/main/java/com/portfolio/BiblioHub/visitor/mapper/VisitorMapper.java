@@ -6,6 +6,7 @@ import com.portfolio.BiblioHub.visitor.entity.Visitor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Mapper for Visitor entity and DTOs.
@@ -13,7 +14,10 @@ import org.mapstruct.MappingTarget;
  * - VisitorRequestDto -> Visitor
  * - Visitor -> VisitorResponseDto
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public interface VisitorMapper {
     /**
      * Converts a request DTO into a Visitor entity.

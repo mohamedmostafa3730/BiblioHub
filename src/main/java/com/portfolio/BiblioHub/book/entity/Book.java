@@ -5,6 +5,7 @@ import com.portfolio.BiblioHub.category.entity.Category;
 import com.portfolio.BiblioHub.publisher.entity.Publisher;
 import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.Entity;
 
 import java.util.List;
 

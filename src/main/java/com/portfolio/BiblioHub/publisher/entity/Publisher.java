@@ -19,7 +19,7 @@ public class Publisher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "publisher_id")
-    private Integer publisherId;
+    private Long publisherId;
 
     @Column(name = "publisher_name", nullable = false, unique = true, length = 50)
     private String publisherName;
@@ -29,7 +29,7 @@ public class Publisher {
 
     @Column(name = "publisher_contact_info", length = 200)
     private String publisherContactInfo;
-    @OneToMany(mappedBy = "publisher")
 
+    @OneToMany(mappedBy = "publisher")
     private List<Book> books;
 }

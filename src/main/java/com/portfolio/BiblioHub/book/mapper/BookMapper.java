@@ -6,6 +6,9 @@ import com.portfolio.BiblioHub.book.entity.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
+
+import java.util.stream.Collectors;
 
 /**
  * Mapper interface for converting between Book entities and DTOs
@@ -16,7 +19,11 @@ import org.mapstruct.MappingTarget;
  * - Convert Book entities into response DTOs for API output.
  * - Update existing Book entities from DTOs without overwriting key fields.
  */
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        imports = {java.util.stream.Collectors.class}
+)
 public interface BookMapper {
 
     // Request DTO -> Entity

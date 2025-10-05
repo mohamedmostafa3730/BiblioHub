@@ -35,7 +35,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public PublisherResponseDto getPublisherById(Integer id) {
+    public PublisherResponseDto getPublisherById(Long id) {
         Publisher publisher = publisherRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Publisher", id));
         return publisherMapper.toResponseDto(publisher);
@@ -50,7 +50,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public PublisherResponseDto updatePublisher(Integer id, PublisherRequestDto dto) {
+    public PublisherResponseDto updatePublisher(Long id, PublisherRequestDto dto) {
         Publisher existing = publisherRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Publisher", id));
 
@@ -67,7 +67,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public void deletePublisher(Integer id) {
+    public void deletePublisher(Long id) {
         Publisher existing = publisherRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Publisher", id));
         publisherRepository.delete(existing);

@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PublisherResponseDto {
-    private Integer publisherId;
+    private Long publisherId;
     private String publisherName;
     private String publisherAddress;
     private String publisherContactInfo;

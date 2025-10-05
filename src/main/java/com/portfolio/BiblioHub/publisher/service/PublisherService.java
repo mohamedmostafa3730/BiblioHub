@@ -8,13 +8,13 @@ import java.util.List;
 public interface PublisherService {
     PublisherResponseDto createPublisher(PublisherRequestDto dto);
 
-    PublisherResponseDto getPublisherById(Integer id);
+    PublisherResponseDto getPublisherById(Long id);
 
     List<PublisherResponseDto> getAllPublishers();
 
-    PublisherResponseDto updatePublisher(Integer id, PublisherRequestDto dto);
+    PublisherResponseDto updatePublisher(Long id, PublisherRequestDto dto);
 
-    void deletePublisher(Integer id);
+    void deletePublisher(Long id);
 
     List<PublisherResponseDto> addAll(List<PublisherRequestDto> dtos);
 

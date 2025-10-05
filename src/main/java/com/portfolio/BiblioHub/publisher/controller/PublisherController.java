@@ -5,6 +5,7 @@ import com.portfolio.BiblioHub.common.dto.ApiResponse;
 import com.portfolio.BiblioHub.publisher.dto.PublisherRequestDto;
 import com.portfolio.BiblioHub.publisher.dto.PublisherResponseDto;
 import com.portfolio.BiblioHub.publisher.service.PublisherService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,22 +16,19 @@ import java.util.List;
 @RequestMapping("/api/publishers")
 @RequiredArgsConstructor
 public class PublisherController {
+
     private final PublisherService publisherService;
     private final ResponseBuilder responseBuilder;
 
-    @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<PublisherResponseDto>>> addAllPublishers(
-            @RequestBody List<PublisherRequestDto> dtos) {
-        return responseBuilder.created(publisherService.addAll(dtos));
-    }
-
     @PostMapping
-    public ResponseEntity<ApiResponse<PublisherResponseDto>> createPublisher(@RequestBody PublisherRequestDto dto) {
+    public ResponseEntity<ApiResponse<PublisherResponseDto>> createPublisher(
+            @Valid @RequestBody PublisherRequestDto dto) {
         return responseBuilder.created(publisherService.createPublisher(dto));
     }
 
     @PostMapping("/bulk")
-    public ResponseEntity<ApiResponse<List<PublisherResponseDto>>> createPublishersBulk(@RequestBody List<PublisherRequestDto> dtos) {
+    public ResponseEntity<ApiResponse<List<PublisherResponseDto>>> addPublishersBulk(
+            @Valid @RequestBody List<PublisherRequestDto> dtos) {
         return responseBuilder.created(publisherService.addAll(dtos));
     }
 
@@ -45,8 +43,9 @@ public class PublisherController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<PublisherResponseDto>> updatePublisher(@PathVariable Long id,
-                                                                             @RequestBody PublisherRequestDto dto) {
+    public ResponseEntity<ApiResponse<PublisherResponseDto>> updatePublisher(
+            @PathVariable Long id,
+            @Valid @RequestBody PublisherRequestDto dto) {
         return responseBuilder.ok(publisherService.updatePublisher(id, dto));
     }
 
