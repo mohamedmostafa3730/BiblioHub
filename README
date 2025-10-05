@@ -1,0 +1,522 @@
+# 📚 BiblioHub - Library Management System
+
+![Java](https://img.shields.io/badge/Java-17+-orange?style=flat&logo=java)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=flat&logo=springboot)
+![JPA](https://img.shields.io/badge/JPA-Hibernate-blue?style=flat)
+![MapStruct](https://img.shields.io/badge/MapStruct-1.5+-yellow?style=flat)
+![License](https://img.shields.io/badge/License-MIT-blue?style=flat)
+
+A comprehensive RESTful API for managing library operations including books, authors, publishers, customers, orders, and visitors. Built with Spring Boot and following industry best practices.
+
+---
+
+## 📋 Table of Contents
+
+- [Features](#-features)
+- [Technology Stack](#-technology-stack)
+- [Database Schema](#-database-schema)
+- [Project Structure](#-project-structure)
+- [API Endpoints](#-api-endpoints)
+- [Getting Started](#-getting-started)
+- [Configuration](#-configuration)
+- [Usage Examples](#-usage-examples)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
+## ✨ Features
+
+### Core Functionality
+- **Book Management**: Complete CRUD operations for books with ISBN validation
+- **Author Management**: Track multiple authors per book with biographical information
+- **Publisher Management**: Manage publisher information and their publications
+- **Category Management**: Organize books into categories
+- **Customer Management**: User accounts with authentication credentials
+- **Order Management**: Complete order processing with order items
+- **Visitor Tracking**: Track website visitors and convert them to customers
+
+### Technical Features
+- ✅ RESTful API design
+- ✅ DTO pattern with MapStruct for efficient mapping
+- ✅ Custom exception handling
+- ✅ Bean validation for data integrity
+- ✅ Bulk operations support
+- ✅ Many-to-many relationships (Books-Authors)
+- ✅ One-to-many relationships (Publisher-Books, Category-Books, Customer-Orders)
+- ✅ One-to-one relationships (Visitor-Customer)
+
+---
+
+## 🛠 Technology Stack
+
+| Technology | Purpose |
+|------------|---------|
+| **Spring Boot 3.x** | Application framework |
+| **Spring Data JPA** | Data persistence layer |
+| **Hibernate** | ORM implementation |
+| **MapStruct** | DTO mapping |
+| **Jakarta Validation** | Input validation |
+| **Lombok** | Boilerplate code reduction |
+| **Maven** | Dependency management |
+| **MySQL/PostgreSQL** | Database (configurable) |
+
+---
+
+## 🗄 Database Schema
+
+```mermaid
+erDiagram
+    BOOK ||--o{ BOOK_AUTHOR : has
+    AUTHOR ||--o{ BOOK_AUTHOR : has
+    BOOK }o--|| PUBLISHER : "published by"
+    BOOK }o--|| CATEGORY : "belongs to"
+    CUSTOMER ||--o{ ORDER_TABLE : places
+    ORDER_TABLE ||--o{ ORDER_ITEM : contains
+    ORDER_ITEM }o--|| BOOK : references
+    VISITOR ||--o| CUSTOMER : "converts to"
+
+    BOOK {
+        bigint book_id PK
+        varchar(50) book_title
+        double book_price
+        varchar(30) book_isbn UK
+        int stock_quantity
+        int publisher_id FK
+        int category_id FK
+    }
+
+    AUTHOR {
+        bigint author_id PK
+        varchar(50) author_name
+        varchar(180) author_bio
+    }
+
+    BOOK_AUTHOR {
+        bigint book_id FK
+        bigint author_id FK
+    }
+
+    PUBLISHER {
+        int publisher_id PK
+        varchar(50) publisher_name UK
+        varchar(200) publisher_address
+        varchar(200) publisher_contact_info
+    }
+
+    CATEGORY {
+        int category_id PK
+        varchar(20) category_name UK
+        varchar(220) category_description
+    }
+
+    CUSTOMER {
+        bigint customer_id PK
+        varchar(50) customer_user_name UK
+        varchar(30) customer_password
+        varchar(400) customer_address
+        varchar(20) customer_phone
+        bigint visitor_id FK
+    }
+
+    ORDER_TABLE {
+        bigint order_id PK
+        bigint customer_id FK
+        datetime order_date
+        varchar order_status
+        double total_amount
+    }
+
+    ORDER_ITEM {
+        bigint order_item_id PK
+        bigint order_id FK
+        bigint book_id FK
+        int quantity
+        double unit_price
+    }
+
+    VISITOR {
+        bigint visitor_id PK
+        varchar(50) visitor_name
+        varchar(30) visitor_email UK
+    }
+```
+
+### Entity Relationships
+
+#### 📖 Book Entity
+- **Many-to-One** with Publisher
+- **Many-to-One** with Category
+- **Many-to-Many** with Author (via BOOK_AUTHOR join table)
+- **One-to-Many** with OrderItem
+
+#### 👤 Customer Entity
+- **One-to-Many** with Order
+- **One-to-One** with Visitor
+
+#### 📦 Order Entity
+- **Many-to-One** with Customer
+- **One-to-Many** with OrderItem
+
+---
+
+## 📁 Project Structure
+
+```
+BiblioHub/
+├── src/main/java/com/portfolio/BiblioHub/
+│   ├── author/
+│   │   ├── controller/      # REST controllers
+│   │   ├── dto/             # Data Transfer Objects
+│   │   ├── entity/          # JPA entities
+│   │   ├── mapper/          # MapStruct mappers
+│   │   ├── repository/      # Spring Data repositories
+│   │   └── service/         # Business logic
+│   │       └── impl/        # Service implementations
+│   ├── book/
+│   ├── bookauthor/          # Junction table management
+│   ├── category/
+│   ├── customer/
+│   ├── order/
+│   ├── publisher/
+│   ├── visitor/
+│   ├── common/
+│   │   ├── builder/         # Response builders
+│   │   ├── dto/             # Common DTOs
+│   │   └── exception/       # Custom exceptions
+│   └── BiblioHubApplication.java
+└── src/main/resources/
+    └── application.properties
+```
+
+### Architectural Patterns
+
+#### Layered Architecture
+```
+Controller Layer → Service Layer → Repository Layer → Database
+      ↓                ↓
+   DTOs          MapStruct Mappers
+```
+
+- **Controllers**: Handle HTTP requests and responses
+- **Services**: Implement business logic and validation
+- **Repositories**: Data access layer
+- **Mappers**: Convert between entities and DTOs
+- **DTOs**: Data transfer between layers
+
+---
+
+## 🔌 API Endpoints
+
+### 📚 Books API
+```http
+POST   /api/books              # Create a single book
+POST   /api/books/bulk         # Bulk create books
+GET    /api/books              # Get all books
+GET    /api/books/{id}         # Get book by ID
+PUT    /api/books/{id}         # Update book
+DELETE /api/books/{id}         # Delete book
+```
+
+### ✍️ Authors API
+```http
+POST   /api/authors            # Create author
+POST   /api/authors/bulk       # Bulk create authors
+GET    /api/authors            # Get all authors
+GET    /api/authors/{id}       # Get author by ID
+PUT    /api/authors/{id}       # Update author
+DELETE /api/authors/{id}       # Delete author
+```
+
+### 🏢 Publishers API
+```http
+POST   /api/publishers         # Create publisher
+POST   /api/publishers/bulk    # Bulk create publishers
+GET    /api/publishers         # Get all publishers
+GET    /api/publishers/{id}    # Get publisher by ID
+PUT    /api/publishers/{id}    # Update publisher
+DELETE /api/publishers/{id}    # Delete publisher
+```
+
+### 📑 Categories API
+```http
+POST   /api/categories         # Create category
+POST   /api/categories/bulk    # Bulk create categories
+GET    /api/categories         # Get all categories
+GET    /api/categories/{id}    # Get category by ID
+PUT    /api/categories/{id}    # Update category
+DELETE /api/categories/{id}    # Delete category
+```
+
+### 👥 Customers API
+```http
+POST   /api/customers          # Create customer
+POST   /api/customers/bulk     # Bulk create customers
+GET    /api/customers          # Get all customers
+GET    /api/customers/{id}     # Get customer by ID
+PUT    /api/customers/{id}     # Update customer
+DELETE /api/customers/{id}     # Delete customer
+```
+
+### 🛒 Orders API
+```http
+POST   /api/orders             # Create order
+POST   /api/orders/bulk        # Bulk create orders
+GET    /api/orders             # Get all orders
+GET    /api/orders/{id}        # Get order by ID
+PUT    /api/orders/{id}        # Update order
+DELETE /api/orders/{id}        # Delete order
+```
+
+### 📋 Order Items API
+```http
+POST   /api/orders/items       # Create order item
+POST   /api/orders/items/bulk  # Bulk create order items
+GET    /api/orders/items       # Get all order items
+GET    /api/orders/items/{id}  # Get order item by ID
+PUT    /api/orders/items/{id}  # Update order item
+DELETE /api/orders/items/{id}  # Delete order item
+```
+
+### 🔗 Book-Author Relationships API
+```http
+POST   /api/book-authors                    # Add author to book
+POST   /api/book-authors/bulk               # Bulk add relationships
+DELETE /api/book-authors/{bookId}/{authorId} # Remove author from book
+GET    /api/book-authors/book/{bookId}      # Get all authors of a book
+GET    /api/book-authors/author/{authorId}  # Get all books by author
+```
+
+### 👤 Visitors API
+```http
+POST   /api/visitors           # Create visitor
+POST   /api/visitors/bulk      # Bulk create visitors
+GET    /api/visitors           # Get all visitors
+GET    /api/visitors/{id}      # Get visitor by ID
+PUT    /api/visitors/{id}      # Update visitor
+DELETE /api/visitors/{id}      # Delete visitor
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Java 17 or higher
+- Maven 3.6+
+- MySQL 8.0+ or PostgreSQL 13+
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/BiblioHub.git
+cd BiblioHub
+```
+
+2. **Configure database**
+Edit `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/bibliohub
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.jpa.hibernate.ddl-auto=update
+```
+
+3. **Build the project**
+```bash
+mvn clean install
+```
+
+4. **Run the application**
+```bash
+mvn spring-boot:run
+```
+
+The API will be available at `http://localhost:8080`
+
+---
+
+## ⚙️ Configuration
+
+### Application Properties
+
+```properties
+# Server Configuration
+server.port=8080
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/bibliohub
+spring.datasource.username=root
+spring.datasource.password=password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+
+# Logging
+logging.level.com.portfolio.BiblioHub=DEBUG
+logging.level.org.hibernate.SQL=DEBUG
+```
+
+---
+
+## 📖 Usage Examples
+
+### Create a Book
+
+**Request:**
+```json
+POST /api/books
+Content-Type: application/json
+
+{
+  "bookTitle": "Clean Code",
+  "bookISBN": "978-0132350884",
+  "bookPrice": 44.99,
+  "stockQuantity": 50,
+  "publisherId": 1,
+  "categoryId": 2,
+  "authorIds": [1, 2]
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Resource created successfully",
+  "data": {
+    "bookId": 1,
+    "bookTitle": "Clean Code",
+    "bookPrice": 44.99,
+    "bookISBN": "978-0132350884",
+    "stockQuantity": 50,
+    "publisherId": 1,
+    "publisherName": "Prentice Hall",
+    "categoryId": 2,
+    "categoryName": "Programming",
+    "authors": ["Robert C. Martin", "James Coplien"]
+  }
+}
+```
+
+### Create an Order
+
+**Request:**
+```json
+POST /api/orders
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "orderStatus": "Pending",
+  "totalAmount": 89.98,
+  "orderItems": [
+    {
+      "bookId": 1,
+      "quantity": 2,
+      "unitPrice": 44.99
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Resource created successfully",
+  "data": {
+    "orderId": 1,
+    "customerId": 1,
+    "customerUserName": "john_doe",
+    "orderDate": "2025-10-05T14:30:00",
+    "orderStatus": "Pending",
+    "totalAmount": 89.98,
+    "orderItems": [
+      {
+        "orderItemId": 1,
+        "bookId": 1,
+        "bookTitle": "Clean Code",
+        "quantity": 2,
+        "unitPrice": 44.99
+      }
+    ]
+  }
+}
+```
+
+### Bulk Create Authors
+
+**Request:**
+```json
+POST /api/authors/bulk
+Content-Type: application/json
+
+[
+  {
+    "authorName": "Robert C. Martin",
+    "authorBio": "Software engineer and author"
+  },
+  {
+    "authorName": "Martin Fowler",
+    "authorBio": "Author and software consultant"
+  }
+]
+```
+
+---
+
+## 🎯 Key Features Implementation
+
+### Validation
+```java
+@NotBlank(message = "The Book Title is required")
+private String bookTitle;
+
+@Positive(message = "The price must be greater than 0")
+private Double bookPrice;
+
+@Min(value = 0, message = "Stock cannot be negative")
+private Integer stockQuantity;
+```
+
+### Exception Handling
+- `RecordNotFoundException`: When entity not found by ID
+- `DuplicateResourceException`: When unique constraint violated
+
+### DTO Mapping with MapStruct
+```java
+@Mapper(componentModel = "spring")
+public interface BookMapper {
+    Book toEntity(BookRequestDto dto);
+    BookResponseDto toResponseDto(Book book);
+    void updateFromDto(BookRequestDto dto, @MappingTarget Book book);
+}
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+<div align="center">
+
+**⭐ Star this repository if you find it helpful!**
+
+Made with ❤️ by the BiblioHub Team
+
+</div>
