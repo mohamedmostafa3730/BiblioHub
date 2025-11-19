@@ -21,10 +21,10 @@ public class Category {
     @Column(name = "category_id")
     private Long categoryId;
 
-    @Column(name = "category_name", length = 20, nullable = false, unique = true)
+    @Column(name = "category_name", nullable = false, unique = true)
     private String categoryName;
 
-    @Column(name = "category_description", length = 220)
+    @Column(name = "category_description")
     private String categoryDescription;
 
     @OneToMany(mappedBy = "category")
