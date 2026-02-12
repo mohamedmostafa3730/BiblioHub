@@ -1,0 +1,1505 @@
+{
+  "info": {
+    "_postman_id": "01ef39ee-4160-4e6d-95ff-e5f4913a5705",
+    "name": "BiblioHub",
+    "description": "# 📚 BiblioHub — Postman Collection Overview\n\n> **Library Management System** | Spring Boot 3.5.6 | Java 21 | PostgreSQL | Port `9090` \n  \n\n---\n\n## Collection Information\n\n| Property | Value |\n| --- | --- |\n| **Base URL** | `http://localhost:9090` |\n| **Framework** | Spring Boot 3.5.6 |\n| **Java Version** | Java 21 |\n| **Database** | PostgreSQL 5432 — BiblioHub |\n| **Total Endpoints** | 62 requests across 9 folders |\n| **Authentication** | Spring Security — Basic Auth (`mohamedMostafa`) |\n| **Content-Type** | `application/json` |\n| **Response Format** | Wrapped `ApiResponse` with `status`, `message`, `data`, `errors`, `timestamp` |\n\n---\n\n## HTTP Method Summary\n\n| GET | POST | PUT | DELETE |\n| --- | --- | --- | --- |\n| 26 requests | 18 requests | 8 requests | 10 requests |\n\n---\n\n## Standard Response Envelope\n\nEvery endpoint returns a consistent `ApiResponse` wrapper:\n\n``` json\n{\n  \"status\": 200,\n  \"message\": \"Ok\",\n  \"data\": { },\n  \"errors\": [],\n  \"timestamp\": \"12-02-2026 00:10:00\"\n}\n\n ```\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `status` | `Integer` | HTTP status code (200, 201, 400, 404, 409, 500) |\n| `message` | `String` | Human-readable result summary |\n| `data` | `T` | Response payload — `null` on errors |\n| `errors` | `List` | Validation/error messages — empty on success |\n| `timestamp` | `String` | Server timestamp — format: `dd-MM-yyyy HH:mm:ss` |\n\n---\n\n## HTTP Status Codes\n\n| Code | Meaning |\n| --- | --- |\n| `200 OK` | GET / PUT — resource retrieved or updated successfully |\n| `201 Created` | POST — resource(s) created successfully |\n| `204 No Content` | DELETE — resource deleted, no body returned |\n| `400 Bad Request` | Validation failure — field errors listed in `errors[]` |\n| `404 Not Found` | Resource with given ID does not exist |\n| `409 Conflict` | Duplicate resource — unique constraint violated |\n| `500 Internal Server Error` | Unexpected server-side error |\n\n---\n\n## Common Error Cases\n\n| Scenario | Response |\n| --- | --- |\n| ID not found | `404` — `\" with id not found.\"` |\n| Duplicate name / ISBN / email | `409` — `\" with = '' already exists.\"` |\n| Missing required field | `400` — `\": \"` |\n| Invalid value (e.g. negative price) | `400` — constraint message from validation annotation |\n\n---\n\n## Folders\n\n---\n\n### 📖 1. Books\n\nManage the book catalog. Supports full CRUD plus bulk creation. Each book is linked to a publisher, category, and one or more authors.\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/books` | Create a single book |\n| `POST` | `/api/books/bulk` | Bulk create books |\n| `GET` | `/api/books` | Retrieve all books |\n| `GET` | `/api/books/{id}` | Retrieve book by ID |\n| `PUT` | `/api/books/{id}` | Update a book by ID |\n| `DELETE` | `/api/books/{id}` | Delete a book by ID |\n\n**Request Body Fields**\n\n| Field | Type | Validation |\n| --- | --- | --- |\n| `bookTitle` | `String` | `@NotBlank` — required |\n| `bookISBN` | `String` | `@NotBlank` — must be unique |\n| `bookPrice` | `Double` | `@NotNull`, `@Positive` — must be > 0 |\n| `stockQuantity` | `Integer` | `@NotNull`, `@Min(0)` — cannot be negative |\n| `publisherId` | `Long` | FK — must reference existing publisher |\n| `categoryId` | `Long` | FK — must reference existing category |\n| `authorIds` | `List` | FK list — must reference existing authors |\n\n---\n\n### ✍️ 2. Authors\n\nManage author records. Authors can be linked to multiple books via the book-author join table.\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/authors` | Create a single author |\n| `POST` | `/api/authors/bulk` | Bulk create authors |\n| `GET` | `/api/authors` | Retrieve all authors |\n| `GET` | `/api/authors/{id}` | Retrieve author by ID |\n| `PUT` | `/api/authors/{id}` | Update an author by ID |\n| `DELETE` | `/api/authors/{id}` | Delete an author by ID |\n\n---\n\n### 🏢 3. Publishers\n\nManage publisher records. Publisher names must be unique. Each publisher can have many books.\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/publishers` | Create a single publisher |\n| `POST` | `/api/publishers/bulk` | Bulk create publishers |\n| `GET` | `/api/publishers` | Retrieve all publishers |\n| `GET` | `/api/publishers/{id}` | Retrieve publisher by ID |\n| `PUT` | `/api/publishers/{id}` | Update a publisher by ID |\n| `DELETE` | `/api/publishers/{id}` | Delete a publisher by ID |\n\n---\n\n### 📑 4. Categories\n\nOrganize books into named categories. Category names must be unique. Response includes a list of book titles in each category.\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/categories` | Create a single category |\n| `POST` | `/api/categories/bulk` | Bulk create categories |\n| `GET` | `/api/categories` | Retrieve all categories |\n| `GET` | `/api/categories/{id}` | Retrieve category by ID |\n| `PUT` | `/api/categories/{id}` | Update a category by ID |\n| `DELETE` | `/api/categories/{id}` | Delete a category by ID |\n\n---\n\n### 👥 5. Customers\n\nManage customer accounts. Usernames must be unique. Passwords are accepted in requests but never returned in responses. Optionally links to a visitor record.\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/customers` | Create a single customer |\n| `POST` | `/api/customers/bulk` | Bulk create customers |\n| `GET` | `/api/customers` | Retrieve all customers |\n| `GET` | `/api/customers/{id}` | Retrieve customer by ID |\n| `PUT` | `/api/customers/{id}` | Update a customer by ID |\n| `DELETE` | `/api/customers/{id}` | Delete a customer by ID |\n\n---\n\n### 🛒 6. Orders\n\nCreate and manage customer orders. Each order is timestamped automatically and must include at least one order item. A convenience endpoint fetches all orders for a specific customer.\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/orders` | Create a single order (with items) |\n| `POST` | `/api/orders/bulk` | Bulk create orders |\n| `GET` | `/api/orders` | Retrieve all orders |\n| `GET` | `/api/orders/{id}` | Retrieve order by ID |\n| `GET` | `/api/orders/customer/{customerId}` | Retrieve all orders for a customer |\n| `PUT` | `/api/orders/{id}` | Update order (replaces all items) |\n| `DELETE` | `/api/orders/{id}` | Delete order and its items |\n\n---\n\n### 📋 7. Order Items\n\nManage individual line items within an order. Each item references a book, a quantity, and a unit price at the time of ordering.\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/orders/items` | Create a single order item |\n| `POST` | `/api/orders/items/bulk` | Bulk create order items |\n| `GET` | `/api/orders/items` | Retrieve all order items |\n| `GET` | `/api/orders/items/{itemId}` | Retrieve order item by ID |\n| `PUT` | `/api/orders/items/{itemId}` | Update an order item by ID |\n| `DELETE` | `/api/orders/items/{itemId}` | Delete an order item by ID |\n\n---\n\n### 🔗 8. Book-Author Relationships\n\nManage the many-to-many join between books and authors. The relationship is enforced by a composite key `(bookId, authorId)`. Duplicate links are rejected. Query from either side.\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/book-authors` | Add one author to a book |\n| `POST` | `/api/book-authors/bulk` | Bulk add book-author links |\n| `GET` | `/api/book-authors/book/{bookId}` | Get all authors of a book |\n| `GET` | `/api/book-authors/author/{authorId}` | Get all books by an author |\n| `DELETE` | `/api/book-authors/{bookId}/{authorId}` | Remove an author from a book |\n\n---\n\n### 👤 9. Visitors\n\nTrack anonymous site visitors by name and email. Visitor emails must be unique. A visitor can be optionally linked to a customer account (one-to-one).\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/visitors` | Create a single visitor |\n| `POST` | `/api/visitors/bulk` | Bulk create visitors |\n| `GET` | `/api/visitors` | Retrieve all visitors |\n| `GET` | `/api/visitors/{id}` | Retrieve visitor by ID |\n| `PUT` | `/api/visitors/{id}` | Update a visitor by ID |\n| `DELETE` | `/api/visitors/{id}` | Delete a visitor by ID |\n\n---\n\n_BiblioHub — Spring Boot 3.5.6 | Java 21 | PostgreSQL | MapStruct | Lombok_",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authors",
+      "item": [
+        {
+          "name": "Create Authors",
+          "id": "3e2f82d7-0660-40ae-87f6-a9010c2e5d19",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"authorName\": \"Ahemd Ali\",\r\n        \"authorBio\": \"Fantasy Writer, Creator of Harry Potter\"\r\n    },\r\n    {\r\n        \"authorName\": \"Ali Ahemd\",\r\n        \"authorBio\": \"Bestselling author known for thriller and crime novels.\"\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/authors/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "authors",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create an Author",
+          "id": "69112674-a314-4bbf-a8f5-7e9cd2c96957",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"authorName\": \"Mostafa Fathy\",\r\n    \"authorBio\": \"Fantasy Writer, Creator of Harry Potter\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/authors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "authors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Authors",
+          "id": "8572ab52-a970-4539-8199-7d45bdffe1bd",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/authors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "authors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Author By ID",
+          "id": "2dc4ed2d-1691-4f70-b59d-2aeaf1e60138",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/authors/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "authors",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Author",
+          "id": "bc9db645-f67d-49f5-aba5-2d27decb703b",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"authorName\": \"samya ali\",\r\n    \"authorBio\": \"Fantasy Writer, Creator of Harry Potter\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/authors/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "authors",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Author",
+          "id": "5b1cf8e6-67ab-4af9-a1c3-826dc8b7a845",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/authors/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "authors",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "e157eb26-f5a9-4733-b0ea-e3129fead32c"
+    },
+    {
+      "name": "Publishers",
+      "item": [
+        {
+          "name": "Create Publishers",
+          "id": "40023ad7-1fcf-4d45-b1a3-48f7225ac42f",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"publisherName\": \"home books\",\r\n        \"publisherAddress\": \"Tech Boulevard, Tokyo, Japan\",\r\n        \"publisherContactInfo\": \"books.jp\",\r\n        \"books\": []\r\n    },\r\n    {\r\n        \"publisherName\": \"Books\",\r\n        \"publisherAddress\": \"Knowledge Valley, Kuala Lumpur, Malaysia\",\r\n        \"publisherContactInfo\": \"unity@mail.my\",\r\n        \"books\": []\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/publishers/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "publishers",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create a Publisher",
+          "id": "889189c0-d5b1-4c34-8a6e-222eff83acba",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n            \"publisherName\": \"roro\",\r\n            \"publisherAddress\": \"Knowledge Valley, Kuala Lumpur, Malaysia\",\r\n            \"publisherContactInfo\": \"roro@mail.my\",\r\n            \"books\": []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/publishers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "publishers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Publishers",
+          "id": "a29f8aa5-9e6f-402f-9b89-6ea50c09e32b",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/publishers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "publishers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Publisher By ID",
+          "id": "080e32e8-f521-434a-aff9-b1944f60b60a",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/publishers/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "publishers",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Publisher",
+          "id": "d70bed29-a1d6-4d6d-bcdd-435a4d71508e",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"publisherName\": \"Unity\",\r\n    \"publisherAddress\": \"Knowledge Valley, Kuala Lumpur, Malaysia\",\r\n    \"publisherContactInfo\": \"Unity@mail.my\",\r\n    \"books\": []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/publishers/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "publishers",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Publisher",
+          "id": "948616ad-1a85-4fab-8c4f-e70792ea4e7f",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/publishers/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "publishers",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "17f89097-8e6d-48c3-acf3-32e23621beb0"
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Create Categories",
+          "id": "e81561e4-1d54-49e5-b070-e9859ce8ee96",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"categoryName\": \"Engineering\",\r\n        \"categoryDescription\": \"methodologies, and best principles.\",\r\n        \"books\": []\r\n    },\r\n    {\r\n        \"categoryName\": \"test\",\r\n        \"categoryDescription\": \"methodologies, and best principles.\",\r\n        \"books\": []\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categories/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create a Category",
+          "id": "350efbef-ea69-454f-8524-0e3068931329",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"categoryName\": \"Help Self\",\r\n    \"categoryDescription\": \"methodologies, and best principles.\",\r\n    \"books\": []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/publishers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "publishers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Categories",
+          "id": "81859f04-2879-435e-8422-a09c8298fd1e",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category By ID",
+          "id": "67d7a043-2467-47d2-b347-f39fcea24259",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/categories/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "id": "8a7e8a13-416d-4fc1-abee-b2a8837053f2",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"categoryName\": \"Software new \",\r\n    \"categoryDescription\": \"and best principles.\",\r\n    \"books\": []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categories/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete category",
+          "id": "f5fea358-0c81-40ca-bb6c-ba072425fb54",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/categories/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "fc7b7158-bf69-47de-a732-382277d18dc8"
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Create Customers",
+          "id": "25ce32c8-df81-42ed-9616-8b208e0a6de6",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"customerUserName\": \"mostafa.dev\",\r\n  \"customerPassword\": \"Dev@2026\",\r\n  \"customerAddress\": \"Smouha, Alexandria, Egypt\",\r\n  \"customerPhone\": \"+201099887766\",\r\n  \"visitorId\": 3\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/customers/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create a Customers",
+          "id": "7ccb77ee-a542-47c5-aa37-0abd249c85d8",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"customerUserName\": \"backend_master\",\r\n  \"customerPassword\": \"Java@1234\",\r\n  \"customerAddress\": \"Nasr City, Cairo, Egypt\",\r\n  \"customerPhone\": \"010 5555 4444\",\r\n  \"visitorId\": 202\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Customers",
+          "id": "8e8e1848-4f13-44d8-a799-1bfd129fcb92",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer By ID",
+          "id": "36476b62-d6e3-4f4b-ba49-bf1b875fe88a",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/customers/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Customer",
+          "id": "9ea32273-0976-46db-b671-bbbd298ea63a",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"customerUserName\": \"backend_master\",\r\n    \"customerPassword\": \"Java@1234\",\r\n    \"customerAddress\": \"Nasr City, Cairo, Egypt\",\r\n    \"customerPhone\": \"010 5555 4444\",\r\n    \"visitorId\": 202\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/customers/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Customer",
+          "id": "4e65de83-9500-4ed1-8ad5-6c6ad07021db",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/publishers/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "publishers",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "36418eec-f57d-4ce9-ab1d-895d029fe35f"
+    },
+    {
+      "name": "Visitor",
+      "item": [
+        {
+          "name": "Create Visitors",
+          "id": "4a6b70c3-04e2-4a89-8df0-a095658c0078",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"visitorName\": \"Mohamed Ali\",\r\n        \"visitorEmail\": \"mohamed.ali@gmail.com\"\r\n    },\r\n    {\r\n        \"visitorName\": \"Ahmed Kamal\",\r\n        \"visitorEmail\": \"ahmed.kamal@yahoo.com\"\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/visitors/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "visitors",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create a Visitor",
+          "id": "f18c55f4-02ed-49e2-b837-d39222163fb4",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"visitorName\": \"Sara Hassan\",\r\n  \"visitorEmail\": \"sara.hassan@outlook.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/visitors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "visitors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Visitors",
+          "id": "5a6ceff2-458a-44c2-93b0-ada76b82929b",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/visitors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "visitors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Visitors By ID",
+          "id": "1634acb8-c083-44e0-b058-ae97158d44d7",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/visitors/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "visitors",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Visitor",
+          "id": "69bdf098-0667-49aa-8add-525927349ee3",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"visitorName\": \"Sara Hassan\",\r\n  \"visitorEmail\": \"sara.hassan@outlook.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/visitors/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "visitors",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Visitor",
+          "id": "59d9ad11-37fd-4b05-80f0-f96a128ac3ea",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/visitors/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "visitors",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "405f702b-a7ff-465b-b363-f510ca0510ed"
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Orders",
+          "id": "bbf1ab4e-b88e-4503-80fb-32ce85f506ae",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"customerId\": 201,\r\n        \"orderStatus\": \"PENDING\",\r\n        \"totalAmount\": 131.48,\r\n        \"orderItems\": [\r\n            {\r\n                \"bookId\": 1,\r\n                \"quantity\": 2,\r\n                \"unitPrice\": 45.99\r\n            },\r\n            {\r\n                \"bookId\": 2,\r\n                \"quantity\": 1,\r\n                \"unitPrice\": 39.50\r\n            }\r\n        ]\r\n    },\r\n    {\r\n        \"customerId\": 201,\r\n        \"orderStatus\": \"PENDING\",\r\n        \"totalAmount\": 131.48,\r\n        \"orderItems\": [\r\n            {\r\n                \"bookId\": 1,\r\n                \"quantity\": 2,\r\n                \"unitPrice\": 45.99\r\n            },\r\n            {\r\n                \"bookId\": 2,\r\n                \"quantity\": 1,\r\n                \"unitPrice\": 39.50\r\n            }\r\n        ]\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create an Order",
+          "id": "27a9fbce-52e8-4cf1-8e4a-3a2083dff14e",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"customerId\": 1,\r\n    \"orderStatus\": \"PENDING\",\r\n    \"totalAmount\": 131.48,\r\n    \"orderItems\": [\r\n        {\r\n            \"bookId\": 2,\r\n            \"quantity\": 2,\r\n            \"unitPrice\": 45.99\r\n        },\r\n        {\r\n            \"bookId\": 3,\r\n            \"quantity\": 1,\r\n            \"unitPrice\": 39.50\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Orders",
+          "id": "ce6bd6da-c8d1-405e-a84f-76e904925972",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Orders By ID",
+          "id": "bdc4cb81-5636-4a8a-85a7-7494d7e0141a",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order",
+          "id": "58369eee-82f4-447f-8c41-d8319687eb55",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"customerId\": 201,\r\n    \"orderStatus\": \"PENDING\",\r\n    \"totalAmount\": 131.48,\r\n    \"orderItems\": [\r\n        {\r\n            \"bookId\": 1,\r\n            \"quantity\": 2,\r\n            \"unitPrice\": 45.99\r\n        },\r\n        {\r\n            \"bookId\": 2,\r\n            \"quantity\": 1,\r\n            \"unitPrice\": 39.50\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Order",
+          "id": "109ca79e-3b3b-4b6a-ba38-76c388718aa2",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "1148f19a-daaa-46c3-8e0c-29cb57c49d2f"
+    },
+    {
+      "name": "Order Items",
+      "item": [
+        {
+          "name": "Create Order Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "8fa83160-a563-4c9b-9731-985c9bdf27b3",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "0f3c7031-dabd-46bb-8e93-0442e7cd2bbe",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"bookId\": 1,\r\n        \"quantity\": 2,\r\n        \"unitPrice\": 45.99\r\n    },\r\n    {\r\n        \"bookId\": 2,\r\n        \"quantity\": 1,\r\n        \"unitPrice\": 39.50\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/items/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "items",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create an Order Item",
+          "id": "5d02bf5d-467f-4a4a-8c9f-fdcf7d08b02f",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bookId\": 1,\r\n    \"quantity\": 2,\r\n    \"unitPrice\": 45.99\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Order Items",
+          "id": "f158c955-001b-440a-9967-954a17635d48",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order Item By ID",
+          "id": "97a5ad42-0546-4851-b45e-5632ea6b1896",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/items/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "items",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order Item",
+          "id": "f9924e62-2fff-441a-b639-94f76e9a26ee",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bookId\": 1,\r\n    \"quantity\": 2,\r\n    \"unitPrice\": 45.99\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/items/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "items",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Order Item",
+          "id": "dde8c81e-5224-4fb3-8bf1-2e300882aa6f",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/items/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "items",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "79a70670-3eb3-4fe0-abc0-4a838df06028"
+    },
+    {
+      "name": "Book-Author Relationships",
+      "item": [
+        {
+          "name": "Add author to book",
+          "id": "f57d337d-81af-45c1-a34b-979b9f372662",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"bookId\": 1,\r\n        \"authorId\": 101\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/book-authors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "book-authors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk add relationships",
+          "id": "7cd4e6e4-1fe4-466f-8b48-62d2fced3241",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"bookId\": 1,\r\n        \"authorId\": 101\r\n    },\r\n    {\r\n        \"bookId\": 1,\r\n        \"authorId\": 101\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/book-authors/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "book-authors",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove author from book",
+          "id": "86d9ba71-0f91-4712-b182-37f6e2ca9258",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/book-authors/{{bookId}}/{{authorId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "book-authors",
+                "{{bookId}}",
+                "{{authorId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all authors of a book",
+          "id": "119d5c22-947a-4d09-951b-e5229eca6381",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/book-authors/book/{{bookId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "book-authors",
+                "book",
+                "{{bookId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all books by author",
+          "id": "9a68fe89-581f-4ac1-ae2d-fcebffb86d5e",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/book-authors/author/{{authorId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "book-authors",
+                "author",
+                "{{authorId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "9bb0c4b2-c8a1-4f5a-a7cc-e8938349e334"
+    },
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "Create Books",
+          "id": "31ab237e-a47d-4ddf-a631-e7b1e34be40c",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\r\n    {\r\n        \"bookTitle\": \"Clean Code\",\r\n        \"BookISBN\": \"9780132350884\",\r\n        \"bookPrice\": 45.99,\r\n        \"stockQuantity\": 120,\r\n        \"publisherId\": 1,\r\n        \"categoryId\": 10,\r\n        \"authorIds\": [\r\n            101,\r\n            102\r\n        ]\r\n    },\r\n    {\r\n        \"bookTitle\": \"Spring Boot in Action\",\r\n        \"BookISBN\": \"9781617292545\",\r\n        \"bookPrice\": 39.50,\r\n        \"stockQuantity\": 50,\r\n        \"publisherId\": 2,\r\n        \"categoryId\": 20,\r\n        \"authorIds\": [\r\n            103\r\n        ]\r\n    }\r\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/books/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "books",
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create a Book",
+          "id": "1141fd7f-509c-44e1-bdfe-8af223de2add",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bookTitle\": \"Spring Boot in Action\",\r\n    \"BookISBN\": \"9780201633610\",\r\n    \"bookPrice\": 39.50,\r\n    \"stockQuantity\": 50,\r\n    \"publisherId\": 2,\r\n    \"categoryId\": 20,\r\n    \"authorIds\": [\r\n        5\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/books",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all Books",
+          "id": "c3936685-8be2-48c5-abca-b7d16d36b446",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/books",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "books"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Book by id",
+          "id": "c2ecd3b9-8be5-4f7b-8880-f62d764cbe09",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/books/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "books",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Book",
+          "id": "fcc7e850-cd93-4432-bfa6-4b9e3c304d4f",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"bookTitle\": \"Refactoring\",\r\n  \"BookISBN\": \"9780134757599\",\r\n  \"bookPrice\": 48.75,\r\n  \"stockQuantity\": 90,\r\n  \"publisherId\": 5,\r\n  \"categoryId\": 50,\r\n  \"authorIds\": [108, 109]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/books/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "books",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Book",
+          "id": "797b7ceb-87e6-4658-bcf3-e6f091748165",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"visitorName\": \"Sara Hassan\",\r\n  \"visitorEmail\": \"sara.hassan@outlook.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/books/{{id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "books",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "a2d8bffd-edec-4143-bba1-3f9ec6439a78"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "id": "963d593e-2882-4daf-a073-748c5a47b1a2",
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "id": "b8299cfc-858f-4720-863b-3554b5a484e8",
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "id": "b1828f5d-444b-4b3e-88c9-3c96a80fa273",
+      "key": "base_url",
+      "value": "https://template.postman-echo.com"
+    },
+    {
+      "id": "9fb6d791-18f5-409e-8693-7f05f2742e84",
+      "key": "bookId",
+      "value": ""
+    },
+    {
+      "id": "944f8620-bc0a-4f43-815f-19e342b8c379",
+      "key": "id",
+      "value": ""
+    },
+    {
+      "id": "30d51076-d59c-491a-9cb4-d30b05ea5288",
+      "key": "authorId",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
